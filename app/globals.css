@@ -1,26 +1,76 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf7f2;
+  --foreground: #1a1614;
+  --nyuzi-amber: #c45c26;
+  --nyuzi-amber-dark: #9a4518;
+  --nyuzi-emerald: #1b4332;
+  --nyuzi-cream: #faf7f2;
+  --nyuzi-sand: #f0e8dc;
+  --nyuzi-ink: #1a1614;
+  --nyuzi-muted: #6b5e54;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-nyuzi-amber: var(--nyuzi-amber);
+  --color-nyuzi-amber-dark: var(--nyuzi-amber-dark);
+  --color-nyuzi-emerald: var(--nyuzi-emerald);
+  --color-nyuzi-cream: var(--nyuzi-cream);
+  --color-nyuzi-sand: var(--nyuzi-sand);
+  --color-nyuzi-ink: var(--nyuzi-ink);
+  --color-nyuzi-muted: var(--nyuzi-muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-fraunces);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #fcd9b8;
+  color: var(--nyuzi-ink);
+}
+
+.font-display {
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+
+.nyuzi-pattern {
+  background-image:
+    linear-gradient(135deg, rgba(196, 92, 38, 0.04) 25%, transparent 25%),
+    linear-gradient(225deg, rgba(27, 67, 50, 0.04) 25%, transparent 25%),
+    linear-gradient(45deg, rgba(27, 67, 50, 0.04) 25%, transparent 25%),
+    linear-gradient(315deg, rgba(196, 92, 38, 0.04) 25%, transparent 25%);
+  background-size: 24px 24px;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.fitting-room-frame {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5),
+    0 24px 48px -12px rgba(26, 22, 20, 0.18);
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--nyuzi-amber);
+  outline-offset: 2px;
 }
