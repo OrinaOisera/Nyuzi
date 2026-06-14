@@ -32,14 +32,22 @@ export function TryOnViewer({
   const showUserPhoto = mode === "photo" && photoUrl;
 
   return (
-    <div className="overflow-hidden rounded-[1.5rem] bg-nyuzi-sand ring-1 ring-stone-200/80">
-      <div className="border-b border-stone-200/80 bg-white/60 px-4 py-3">
-        <p className="text-center text-xs font-semibold uppercase tracking-wider text-nyuzi-muted">
-          Fitting room preview
+    <div className="fitting-room-frame overflow-hidden rounded-[1.75rem] bg-nyuzi-sand ring-1 ring-stone-200/60">
+      <div className="flex items-center justify-between border-b border-stone-200/60 bg-gradient-to-r from-white/90 to-nyuzi-cream/90 px-5 py-3.5">
+        <div className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-red-400/80" aria-hidden />
+          <span className="h-2 w-2 rounded-full bg-nyuzi-gold/80" aria-hidden />
+          <span className="h-2 w-2 rounded-full bg-emerald-400/80" aria-hidden />
+        </div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-nyuzi-muted">
+          Fitting room
         </p>
+        <div className="w-12" aria-hidden />
       </div>
 
-      <div className="relative mx-auto aspect-[3/4] max-w-md bg-gradient-to-b from-stone-100 to-nyuzi-sand">
+      <div className="relative mx-auto aspect-[3/4] max-w-md bg-gradient-to-b from-stone-100 via-nyuzi-cream to-nyuzi-sand">
+        <div className="pointer-events-none absolute inset-4 rounded-2xl border border-white/40" aria-hidden />
+
         {showUserPhoto ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -61,7 +69,7 @@ export function TryOnViewer({
           />
         )}
 
-        <div className="absolute inset-0 flex items-end justify-center pb-6">
+        <div className="absolute inset-0 flex items-end justify-center pb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={overlayUrl}
@@ -77,9 +85,12 @@ export function TryOnViewer({
         </div>
 
         {!showUserPhoto && mode === "photo" && (
-          <div className="absolute inset-0 flex items-center justify-center bg-nyuzi-ink/30 p-8 text-center backdrop-blur-[2px]">
-            <div className="rounded-2xl bg-white/90 px-5 py-4 shadow-lg">
-              <p className="text-sm font-medium text-nyuzi-ink">
+          <div className="absolute inset-0 flex items-center justify-center bg-nyuzi-ink/25 p-8 backdrop-blur-[3px]">
+            <div className="max-w-xs rounded-2xl bg-white/95 px-6 py-5 text-center shadow-xl ring-1 ring-white">
+              <p className="text-2xl" aria-hidden>
+                📷
+              </p>
+              <p className="mt-2 text-sm font-medium leading-relaxed text-nyuzi-ink">
                 Upload a full-body photo to preview the garment on you
               </p>
             </div>
@@ -87,12 +98,18 @@ export function TryOnViewer({
         )}
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t border-stone-200/80 bg-white/70 px-4 py-3 text-center text-xs text-nyuzi-muted">
-        <span>{showUserPhoto ? "Your photo" : mode === "model" ? "Model preview" : "Awaiting photo"}</span>
-        <span aria-hidden>·</span>
+      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t border-stone-200/60 bg-white/80 px-4 py-3.5 text-center text-xs text-nyuzi-muted">
+        <span className="font-semibold text-nyuzi-ink/70">
+          {showUserPhoto ? "Your photo" : mode === "model" ? "Model preview" : "Awaiting photo"}
+        </span>
+        <span className="text-stone-300" aria-hidden>
+          |
+        </span>
         <span>Bust {measurements.bust_cm} cm</span>
-        <span aria-hidden>·</span>
-        <span>Height {measurements.height_cm} cm</span>
+        <span className="text-stone-300" aria-hidden>
+          ·
+        </span>
+        <span>H {measurements.height_cm} cm</span>
       </div>
     </div>
   );

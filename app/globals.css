@@ -5,7 +5,10 @@
   --foreground: #1a1614;
   --nyuzi-amber: #c45c26;
   --nyuzi-amber-dark: #9a4518;
+  --nyuzi-amber-light: #f4a261;
   --nyuzi-emerald: #1b4332;
+  --nyuzi-emerald-light: #2d6a4f;
+  --nyuzi-gold: #d4a853;
   --nyuzi-cream: #faf7f2;
   --nyuzi-sand: #f0e8dc;
   --nyuzi-ink: #1a1614;
@@ -17,7 +20,10 @@
   --color-foreground: var(--foreground);
   --color-nyuzi-amber: var(--nyuzi-amber);
   --color-nyuzi-amber-dark: var(--nyuzi-amber-dark);
+  --color-nyuzi-amber-light: var(--nyuzi-amber-light);
   --color-nyuzi-emerald: var(--nyuzi-emerald);
+  --color-nyuzi-emerald-light: var(--nyuzi-emerald-light);
+  --color-nyuzi-gold: var(--nyuzi-gold);
   --color-nyuzi-cream: var(--nyuzi-cream);
   --color-nyuzi-sand: var(--nyuzi-sand);
   --color-nyuzi-ink: var(--nyuzi-ink);
@@ -47,6 +53,7 @@ body {
   font-family: var(--font-fraunces), Georgia, serif;
 }
 
+/* ── Backgrounds ── */
 .nyuzi-pattern {
   background-image:
     linear-gradient(135deg, rgba(196, 92, 38, 0.04) 25%, transparent 25%),
@@ -56,16 +63,134 @@ body {
   background-size: 24px 24px;
 }
 
+.mesh-hero {
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 20%, rgba(244, 162, 97, 0.18), transparent 50%),
+    radial-gradient(ellipse 60% 50% at 90% 10%, rgba(212, 168, 83, 0.12), transparent 45%),
+    radial-gradient(ellipse 70% 60% at 70% 90%, rgba(27, 67, 50, 0.1), transparent 50%),
+    var(--nyuzi-cream);
+}
+
 .glass-panel {
   background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
 }
 
 .fitting-room-frame {
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.5),
-    0 24px 48px -12px rgba(26, 22, 20, 0.18);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+    0 32px 64px -16px rgba(26, 22, 20, 0.22),
+    0 0 0 1px rgba(26, 22, 20, 0.04);
+}
+
+.textile-stripe {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--nyuzi-amber) 0px,
+    var(--nyuzi-amber) 8px,
+    var(--nyuzi-gold) 8px,
+    var(--nyuzi-gold) 16px,
+    var(--nyuzi-emerald) 16px,
+    var(--nyuzi-emerald) 24px,
+    #2d6a4f 24px,
+    #2d6a4f 32px
+  );
+  height: 4px;
+}
+
+/* ── Animations ── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+}
+
+.animate-delay-1 {
+  animation-delay: 0.12s;
+}
+.animate-delay-2 {
+  animation-delay: 0.24s;
+}
+.animate-delay-3 {
+  animation-delay: 0.36s;
+}
+.animate-delay-4 {
+  animation-delay: 0.48s;
+}
+.animate-delay-5 {
+  animation-delay: 0.6s;
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    var(--nyuzi-amber) 0%,
+    var(--nyuzi-gold) 40%,
+    var(--nyuzi-amber) 80%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
 }
 
 input:focus-visible,
@@ -73,4 +198,16 @@ select:focus-visible,
 button:focus-visible {
   outline: 2px solid var(--nyuzi-amber);
   outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-float,
+  .animate-marquee,
+  .shimmer-text {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    -webkit-text-fill-color: var(--nyuzi-amber);
+  }
 }

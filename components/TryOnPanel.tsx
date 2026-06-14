@@ -145,29 +145,32 @@ export function TryOnPanel({ product }: TryOnPanelProps) {
         )}
       </div>
 
-      <div className="space-y-6">
-        <div className="rounded-[1.25rem] bg-white p-6 ring-1 ring-stone-200/80">
-          <p className="text-xs font-semibold uppercase tracking-wider text-nyuzi-amber">
-            {OCCASION_LABELS[product.occasion]}
-          </p>
-          <h1 className="font-display mt-2 text-3xl font-semibold text-nyuzi-ink">
-            {product.name}
-          </h1>
-          {product.description && (
-            <p className="mt-2 leading-relaxed text-nyuzi-muted">{product.description}</p>
-          )}
-          <p className="mt-4 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xl font-semibold text-nyuzi-emerald">
-            {formatPrice(product.price_cents)}
-          </p>
-          <p className="mt-3 text-sm text-nyuzi-muted">
-            Custom-fit by{" "}
-            <Link href={artisanHref} className="font-semibold text-nyuzi-amber hover:underline">
-              {product.artisan.display_name}
-            </Link>
-          </p>
+      <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+        <div className="overflow-hidden rounded-[1.35rem] bg-white shadow-sm ring-1 ring-stone-200/70">
+          <div className="h-1 bg-gradient-to-r from-nyuzi-amber via-nyuzi-gold to-nyuzi-emerald" />
+          <div className="p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-nyuzi-amber">
+              {OCCASION_LABELS[product.occasion]}
+            </p>
+            <h1 className="font-display mt-2 text-3xl font-semibold leading-tight text-nyuzi-ink">
+              {product.name}
+            </h1>
+            {product.description && (
+              <p className="mt-3 leading-relaxed text-nyuzi-muted">{product.description}</p>
+            )}
+            <p className="mt-5 inline-flex rounded-full bg-gradient-to-r from-emerald-50 to-teal-50 px-4 py-1.5 text-xl font-semibold text-nyuzi-emerald ring-1 ring-emerald-100">
+              {formatPrice(product.price_cents)}
+            </p>
+            <p className="mt-4 text-sm text-nyuzi-muted">
+              Custom-fit by{" "}
+              <Link href={artisanHref} className="font-semibold text-nyuzi-amber hover:underline">
+                {product.artisan.display_name}
+              </Link>
+            </p>
+          </div>
         </div>
 
-        <div className="rounded-[1.25rem] bg-white p-6 ring-1 ring-stone-200/80">
+        <div className="rounded-[1.35rem] bg-white p-6 shadow-sm ring-1 ring-stone-200/70">
           <h2 className="font-display text-xl font-semibold text-nyuzi-ink">Your measurements</h2>
           <p className="mt-1 text-sm text-nyuzi-muted">
             Adjust values to see the overlay update in real time.

@@ -6,59 +6,64 @@ import { OCCASION_LABELS } from "@/types/database";
 
 interface ProductCardProps {
   product: ProductWithArtisan;
+  featured?: boolean;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, featured = false }: ProductCardProps) {
   const artisanHref = product.artisan.slug
     ? `/artisan/${product.artisan.slug}`
     : `/artisan/${product.artisan.id}`;
 
   return (
-    <article className="group overflow-hidden rounded-[1.25rem] bg-white shadow-sm ring-1 ring-stone-200/80 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-stone-900/8 hover:ring-amber-200/80">
+    <article
+      className={`group relative overflow-hidden rounded-[1.35rem] bg-white transition duration-500 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-stone-900/10 ${
+        featured
+          ? "ring-2 ring-nyuzi-amber/30 shadow-lg shadow-amber-900/5"
+          : "ring-1 ring-stone-200/80 shadow-sm hover:ring-amber-200/90"
+      }`}
+    >
       <Link href={`/try-on/${product.id}`} className="relative block">
-        <div className="relative aspect-[3/4] overflow-hidden bg-nyuzi-sand">
+        <div className={`relative overflow-hidden bg-nyuzi-sand ${featured ? "aspect-[4/5]" : "aspect-[3/4]"}`}>
           <Image
             src={product.image_url}
             alt={product.name}
             fill
-            className="object-cover transition duration-500 group-hover:scale-105"
+            className="object-cover transition duration-700 ease-out group-hover:scale-110"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-nyuzi-ink/55 via-transparent to-transparent opacity-80 transition group-hover:opacity-100" />
-          <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-nyuzi-amber backdrop-blur-sm">
+          <div className="absolute inset-0 bg-gradient-to-t from-nyuzi-ink/70 via-nyuzi-ink/5 to-transparent" />
+          <span className="absolute left-3 top-3 rounded-full bg-nyuzi-ink/80 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-sm">
             {OCCASION_LABELS[product.occasion]}
           </span>
-          <div className="absolute bottom-0 left-0 right-0 translate-y-2 p-4 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-            <span className="inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-nyuzi-ink shadow-lg">
-              Virtual try-on →
+          <span className="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-bold text-nyuzi-emerald backdrop-blur-sm">
+            {formatPrice(product.price_cents)}
+          </span>
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-nyuzi-gold">
+              {product.fabric_name}
+            </p>
+            <p className="font-display mt-1 text-xl font-semibold text-white drop-shadow-sm">
+              {product.name}
+            </p>
+            <span className="mt-3 inline-flex translate-y-2 items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-semibold text-nyuzi-ink opacity-0 shadow-lg transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+              Try on virtually
+              <span aria-hidden>→</span>
             </span>
           </div>
         </div>
       </Link>
-      <div className="space-y-2.5 p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <Link
-              href={`/try-on/${product.id}`}
-              className="font-display text-lg font-semibold text-nyuzi-ink transition hover:text-nyuzi-amber"
-            >
-              {product.name}
-            </Link>
-            <p className="mt-0.5 text-sm text-nyuzi-muted">{product.fabric_name}</p>
-          </div>
-          <p className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-sm font-semibold text-nyuzi-emerald">
-            {formatPrice(product.price_cents)}
-          </p>
-        </div>
+      <div className="border-t border-stone-100 px-5 py-4">
         <p className="text-sm text-nyuzi-muted">
           by{" "}
           <Link
             href={artisanHref}
-            className="font-medium text-nyuzi-amber transition hover:underline"
+            className="font-semibold text-nyuzi-amber transition hover:underline"
           >
             {product.artisan.display_name}
           </Link>
-          {product.artisan.location ? ` · ${product.artisan.location}` : ""}
+          {product.artisan.location && (
+            <span className="text-nyuzi-muted/70"> · {product.artisan.location}</span>
+          )}
         </p>
       </div>
     </article>
