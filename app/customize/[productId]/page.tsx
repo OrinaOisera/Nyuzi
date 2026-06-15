@@ -1,13 +1,13 @@
 import { BackLink } from "@/components/BackLink";
+import { CustomizePanel } from "@/components/customize/CustomizePanel";
 import { notFound, redirect } from "next/navigation";
-import { TryOnPanel } from "@/components/TryOnPanel";
 import { getProduct } from "@/lib/data";
 
-interface TryOnPageProps {
+interface CustomizePageProps {
   params: Promise<{ productId: string }>;
 }
 
-export default async function TryOnPage({ params }: TryOnPageProps) {
+export default async function CustomizePage({ params }: CustomizePageProps) {
   const { productId } = await params;
   const product = await getProduct(productId);
 
@@ -15,15 +15,15 @@ export default async function TryOnPage({ params }: TryOnPageProps) {
     notFound();
   }
 
-  if (product.category !== "garment") {
-    redirect(`/customize/${product.id}`);
+  if (product.category === "garment") {
+    redirect(`/try-on/${product.id}`);
   }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
       <BackLink href="/">Back to shop</BackLink>
       <div className="mt-6">
-        <TryOnPanel product={product} />
+        <CustomizePanel product={product} />
       </div>
     </div>
   );

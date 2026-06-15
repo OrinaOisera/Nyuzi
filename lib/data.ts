@@ -14,6 +14,7 @@ interface ProductRow {
   artisan_id: string;
   name: string;
   description: string | null;
+  category: Product["category"];
   fabric_name: string;
   fabric_history: string | null;
   occasion: Product["occasion"];
@@ -33,6 +34,7 @@ function mapProductRow(row: ProductRow): ProductWithArtisan {
     artisan_id: row.artisan_id,
     name: row.name,
     description: row.description,
+    category: row.category ?? "garment",
     fabric_name: row.fabric_name,
     fabric_history: row.fabric_history,
     occasion: row.occasion,
@@ -77,29 +79,37 @@ export async function getArtisans(): Promise<Artisan[]> {
 }
 
 export async function getProducts(
-  occasion?: string | null
+  occasion?: string | null,
+  category?: string | null
 ): Promise<ProductWithArtisan[]> {
   if (!isDatabaseConfigured()) {
-    return getMockProductsWithArtisans(occasion);
+    return getMockProductsWithArtisans(occasion, category);
   }
 
   try {
-    const rows = occasion
-      ? await query<ProductRow>(
-          `${PRODUCT_SELECT}
-           where p.is_active = true and p.occasion = $1::occasion_type
-           order by p.created_at desc`,
-          [occasion]
-        )
-      : await query<ProductRow>(
-          `${PRODUCT_SELECT}
-           where p.is_active = true
-           order by p.created_at desc`
-        );
+    const conditions = ["p.is_active = true"];
+    const params: string[] = [];
+
+    if (occasion) {
+      params.push(occasion);
+      conditions.push(`p.occasion = $${params.length}::occasion_type`);
+    }
+
+    if (category) {
+      params.push(category);
+      conditions.push(`p.category = $${params.length}::product_category`);
+    }
+
+    const rows = await query<ProductRow>(
+      `${PRODUCT_SELECT}
+       where ${conditions.join(" and ")}
+       order by p.created_at desc`,
+      params
+    );
 
     return rows.map(mapProductRow);
   } catch {
-    return getMockProductsWithArtisans(occasion);
+    return getMockProductsWithArtisans(occasion, category);
   }
 }
 

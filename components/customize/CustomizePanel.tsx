@@ -3,86 +3,47 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { MeasurementForm } from "@/components/MeasurementForm";
-import { PhotoUpload } from "@/components/PhotoUpload";
-import { TryOnViewer } from "@/components/TryOnViewer";
+import { AccessoryCustomizer } from "@/components/customize/AccessoryCustomizer";
+import { BagCustomizer } from "@/components/customize/BagCustomizer";
+import { CustomizePreview } from "@/components/customize/CustomizePreview";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { createCheckoutSession } from "@/lib/actions/checkout";
-import { saveMeasurements } from "@/lib/actions/measurements";
+import { formatCustomizationSummary } from "@/lib/format-customization";
 import { formatPrice } from "@/lib/format";
-import type { MeasurementInput, ProductWithArtisan } from "@/types/database";
+import type { CustomizationSnapshot } from "@/types/customization";
+import {
+  CATEGORY_LABELS,
+  DEFAULT_ACCESSORY,
+  DEFAULT_BAG,
+} from "@/types/customization";
+import type { ProductWithArtisan } from "@/types/database";
 import { OCCASION_LABELS } from "@/types/database";
 
-const DEFAULT_MEASUREMENTS: MeasurementInput = {
-  bust_cm: 90,
-  waist_cm: 70,
-  hips_cm: 95,
-  height_cm: 165,
-};
-
-interface TryOnPanelProps {
+interface CustomizePanelProps {
   product: ProductWithArtisan;
 }
 
-function ViewModeToggle({
-  mode,
-  onChange,
-}: {
-  mode: "model" | "photo";
-  onChange: (mode: "model" | "photo") => void;
-}) {
-  const options: { value: "model" | "photo"; label: string }[] = [
-    { value: "model", label: "Model" },
-    { value: "photo", label: "Your photo" },
-  ];
-
-  return (
-    <div className="inline-flex rounded-full bg-nyuzi-sand p-1 ring-1 ring-stone-200/80">
-      {options.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          onClick={() => onChange(option.value)}
-          className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
-            mode === option.value
-              ? "bg-white text-nyuzi-ink shadow-sm"
-              : "text-nyuzi-muted hover:text-nyuzi-ink"
-          }`}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-export function TryOnPanel({ product }: TryOnPanelProps) {
+export function CustomizePanel({ product }: CustomizePanelProps) {
   const router = useRouter();
-  const [measurements, setMeasurements] = useState<MeasurementInput>(DEFAULT_MEASUREMENTS);
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"model" | "photo">("model");
+  const [bagOptions, setBagOptions] = useState(DEFAULT_BAG);
+  const [accessoryOptions, setAccessoryOptions] = useState(DEFAULT_ACCESSORY);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSaveMeasurements() {
-    const result = await saveMeasurements(measurements);
-    if (!result.success) {
-      setError(result.error ?? "Could not save measurements.");
-      return;
-    }
-    setError(null);
-  }
+  const customization: CustomizationSnapshot =
+    product.category === "bag"
+      ? bagOptions
+      : { ...accessoryOptions, type: "accessory" as const };
 
   async function handleCheckout() {
     setLoading(true);
     setError(null);
 
-    await saveMeasurements(measurements);
     const result = await createCheckoutSession({
       productId: product.id,
-      customization: { type: "garment", measurements },
+      customization,
     });
 
     setLoading(false);
@@ -99,7 +60,6 @@ export function TryOnPanel({ product }: TryOnPanelProps) {
 
     if ("demo" in result && result.demo) {
       router.push(`/checkout/success?demo=1&productId=${product.id}`);
-      return;
     }
   }
 
@@ -107,30 +67,16 @@ export function TryOnPanel({ product }: TryOnPanelProps) {
     ? `/artisan/${product.artisan.slug}`
     : `/artisan/${product.artisan.id}`;
 
+  const categoryLabel = CATEGORY_LABELS[product.category];
+
   return (
-    <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+    <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
       <div className="space-y-5 lg:sticky lg:top-24">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <ViewModeToggle mode={viewMode} onChange={setViewMode} />
-        </div>
-
-        {viewMode === "photo" && (
-          <PhotoUpload
-            photoUrl={photoUrl}
-            onPhotoChange={(url) => {
-              setPhotoUrl(url);
-              if (url) setViewMode("photo");
-            }}
-          />
-        )}
-
-        <TryOnViewer
+        <CustomizePreview
           productName={product.name}
-          productImageUrl={product.image_url}
-          overlayUrl={product.overlay_png_url}
-          photoUrl={photoUrl}
-          measurements={measurements}
-          mode={viewMode}
+          imageUrl={product.image_url}
+          bag={product.category === "bag" ? bagOptions : undefined}
+          accessory={product.category === "accessory" ? accessoryOptions : undefined}
         />
 
         {product.fabric_history && (
@@ -150,7 +96,7 @@ export function TryOnPanel({ product }: TryOnPanelProps) {
           <div className="h-1 bg-gradient-to-r from-nyuzi-amber via-nyuzi-gold to-nyuzi-emerald" />
           <div className="p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.15em] text-nyuzi-amber">
-              {OCCASION_LABELS[product.occasion]}
+              {categoryLabel} · {OCCASION_LABELS[product.occasion]}
             </p>
             <h1 className="font-display mt-2 text-3xl font-semibold leading-tight text-nyuzi-ink">
               {product.name}
@@ -162,7 +108,7 @@ export function TryOnPanel({ product }: TryOnPanelProps) {
               {formatPrice(product.price_cents)}
             </p>
             <p className="mt-4 text-sm text-nyuzi-muted">
-              Custom-fit by{" "}
+              Handcrafted by{" "}
               <Link href={artisanHref} className="font-semibold text-nyuzi-amber hover:underline">
                 {product.artisan.display_name}
               </Link>
@@ -171,16 +117,20 @@ export function TryOnPanel({ product }: TryOnPanelProps) {
         </div>
 
         <div className="rounded-[1.35rem] bg-white p-6 shadow-sm ring-1 ring-stone-200/70">
-          <h2 className="font-display text-xl font-semibold text-nyuzi-ink">Your measurements</h2>
+          <h2 className="font-display text-xl font-semibold text-nyuzi-ink">
+            Customize your {product.category === "bag" ? "bag" : "piece"}
+          </h2>
           <p className="mt-1 text-sm text-nyuzi-muted">
-            Adjust values to see the overlay update in real time.
+            {product.category === "bag"
+              ? "Select size and Ankara print — your artisan cuts and lines each bag to order."
+              : "Choose bracelet or chain, size, and beads or brass with your preferred details."}
           </p>
-          <div className="mt-5">
-            <MeasurementForm
-              initial={DEFAULT_MEASUREMENTS}
-              onChange={setMeasurements}
-              onSave={handleSaveMeasurements}
-            />
+          <div className="mt-6">
+            {product.category === "bag" ? (
+              <BagCustomizer value={bagOptions} onChange={setBagOptions} />
+            ) : (
+              <AccessoryCustomizer value={accessoryOptions} onChange={setAccessoryOptions} />
+            )}
           </div>
         </div>
 
@@ -197,7 +147,7 @@ export function TryOnPanel({ product }: TryOnPanelProps) {
             disabled={loading}
             onClick={() => setCheckoutOpen(true)}
           >
-            Order custom fit
+            Order customized {product.category === "bag" ? "bag" : "piece"}
           </Button>
           <Link
             href={artisanHref}
@@ -215,15 +165,12 @@ export function TryOnPanel({ product }: TryOnPanelProps) {
       >
         <div className="space-y-4">
           <p className="leading-relaxed text-nyuzi-muted">
-            You&apos;re ordering <strong className="text-nyuzi-ink">{product.name}</strong> in a
-            custom fit. Your artisan will tailor this piece to your exact measurements.
+            You&apos;re ordering <strong className="text-nyuzi-ink">{product.name}</strong> with
+            your custom selections. Your artisan will craft this piece to your specifications.
           </p>
-          <ul className="space-y-2 rounded-xl bg-nyuzi-cream p-4 text-sm text-nyuzi-ink ring-1 ring-stone-200/70">
-            <li>Bust: {measurements.bust_cm} cm</li>
-            <li>Waist: {measurements.waist_cm} cm</li>
-            <li>Hips: {measurements.hips_cm} cm</li>
-            <li>Height: {measurements.height_cm} cm</li>
-          </ul>
+          <p className="rounded-xl bg-nyuzi-cream px-4 py-3 text-sm text-nyuzi-ink ring-1 ring-stone-200/70">
+            {formatCustomizationSummary(customization)}
+          </p>
           <p className="text-lg font-semibold text-nyuzi-emerald">
             Total: {formatPrice(product.price_cents)}
           </p>

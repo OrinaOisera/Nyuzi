@@ -11,6 +11,7 @@ create type occasion_type as enum (
   'casual_wear'
 );
 create type order_status as enum ('pending', 'paid', 'fulfilled', 'cancelled');
+create type product_category as enum ('garment', 'bag', 'accessory');
 
 create table profiles (
   id uuid primary key default uuid_generate_v4(),
@@ -38,6 +39,7 @@ create table products (
   artisan_id uuid not null references artisans(id) on delete cascade,
   name text not null,
   description text,
+  category product_category not null default 'garment',
   fabric_name text not null,
   fabric_history text,
   occasion occasion_type not null default 'casual_wear',
@@ -73,6 +75,7 @@ create table orders (
 );
 
 create index idx_products_occasion on products(occasion) where is_active = true;
+create index idx_products_category on products(category) where is_active = true;
 create index idx_products_artisan on products(artisan_id);
 create index idx_orders_buyer on orders(buyer_id);
 create index idx_measurements_user on measurements(user_id, updated_at desc);

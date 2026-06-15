@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
+import { formatCustomizationSummary } from "@/lib/format-customization";
 import { formatPrice } from "@/lib/format";
 import { getBuyerOrders, getProduct } from "@/lib/data";
 import { getSession } from "@/lib/auth";
@@ -105,10 +106,7 @@ export default async function BuyerOrdersPage() {
                       </span>
                     </div>
                     <p className="mt-2 text-sm text-stone-600">
-                      Measurements: B {order.measurement_snapshot.bust_cm} · W{" "}
-                      {order.measurement_snapshot.waist_cm} · H{" "}
-                      {order.measurement_snapshot.hips_cm} ·{" "}
-                      {order.measurement_snapshot.height_cm} cm
+                      Customization: {formatCustomizationSummary(order.measurement_snapshot)}
                     </p>
                     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                       <span className="font-semibold text-emerald-800">

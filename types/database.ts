@@ -1,5 +1,7 @@
 export type UserRole = "buyer" | "artisan" | "admin";
 
+export type ProductCategory = "garment" | "bag" | "accessory";
+
 export type OccasionType =
   | "traditional_wedding"
   | "formal_gala"
@@ -34,6 +36,7 @@ export interface Product {
   artisan_id: string;
   name: string;
   description: string | null;
+  category: ProductCategory;
   fabric_name: string;
   fabric_history: string | null;
   occasion: OccasionType;
@@ -66,6 +69,8 @@ export interface MeasurementInput {
   height_cm: number;
 }
 
+import type { CustomizationSnapshot } from "@/types/customization";
+
 export interface Order {
   id: string;
   buyer_id: string;
@@ -75,7 +80,7 @@ export interface Order {
   stripe_payment_intent_id: string | null;
   amount_cents: number;
   status: OrderStatus;
-  measurement_snapshot: MeasurementInput;
+  measurement_snapshot: CustomizationSnapshot;
   created_at: string;
 }
 

@@ -1,9 +1,9 @@
 import type {
   BuyerOrderWithDetails,
-  MeasurementInput,
   OrderStatus,
   OrderWithDetails,
 } from "@/types/database";
+import type { CustomizationSnapshot } from "@/types/customization";
 import { MOCK_ORDERS, MOCK_ARTISANS } from "@/lib/mock-data";
 
 let orders: OrderWithDetails[] = MOCK_ORDERS.map((o) => ({ ...o }));
@@ -46,7 +46,7 @@ export function addMockOrder(input: {
   product_id: string;
   amount_cents: number;
   status: OrderStatus;
-  measurement_snapshot: MeasurementInput;
+  measurement_snapshot: CustomizationSnapshot;
   product_name: string;
   buyer_name: string;
   artisan_name: string;
