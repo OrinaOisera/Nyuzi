@@ -20,7 +20,7 @@ function toBuyerOrder(order: OrderWithDetails): BuyerOrderWithDetails {
     stripe_payment_intent_id: order.stripe_payment_intent_id,
     amount_cents: order.amount_cents,
     status: order.status,
-    measurement_snapshot: order.measurement_snapshot,
+    customization_snapshot: order.customization_snapshot,
     created_at: order.created_at,
     product_name: order.product_name,
     artisan_name: artisanNames.get(order.artisan_id) ?? "Artisan",
@@ -46,7 +46,7 @@ export function addMockOrder(input: {
   product_id: string;
   amount_cents: number;
   status: OrderStatus;
-  measurement_snapshot: CustomizationSnapshot;
+  customization_snapshot: CustomizationSnapshot;
   product_name: string;
   buyer_name: string;
   artisan_name: string;
@@ -60,7 +60,7 @@ export function addMockOrder(input: {
     stripe_payment_intent_id: null,
     amount_cents: input.amount_cents,
     status: input.status,
-    measurement_snapshot: input.measurement_snapshot,
+    customization_snapshot: input.customization_snapshot,
     created_at: new Date().toISOString(),
     product_name: input.product_name,
     buyer_name: input.buyer_name,

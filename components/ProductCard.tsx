@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/format";
+import { productHrefFromProduct } from "@/lib/product-routes";
 import { CATEGORY_LABELS } from "@/types/customization";
 import type { ProductWithArtisan } from "@/types/database";
 import { OCCASION_LABELS } from "@/types/database";
@@ -8,12 +9,6 @@ import { OCCASION_LABELS } from "@/types/database";
 interface ProductCardProps {
   product: ProductWithArtisan;
   featured?: boolean;
-}
-
-function productHref(product: ProductWithArtisan): string {
-  return product.category === "garment"
-    ? `/try-on/${product.id}`
-    : `/customize/${product.id}`;
 }
 
 function productCta(product: ProductWithArtisan): string {
@@ -40,7 +35,7 @@ export function ProductCard({ product, featured = false }: ProductCardProps) {
           : "ring-1 ring-stone-200/80 shadow-sm hover:ring-amber-200/90"
       }`}
     >
-      <Link href={productHref(product)} className="relative block">
+      <Link href={productHrefFromProduct(product)} className="relative block">
         <div className={`relative overflow-hidden bg-nyuzi-sand ${featured ? "aspect-[4/5]" : "aspect-[3/4]"}`}>
           <Image
             src={product.image_url}

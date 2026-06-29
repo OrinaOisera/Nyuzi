@@ -1,5 +1,7 @@
 export type UserRole = "buyer" | "artisan" | "admin";
 
+import type { PaletteColorId } from "@/types/palette";
+
 export type ProductCategory = "garment" | "bag" | "accessory";
 
 export type OccasionType =
@@ -26,6 +28,7 @@ export interface Artisan {
   slug: string | null;
   location: string | null;
   story: string | null;
+  social_impact: string | null;
   heritage_video_url: string | null;
   behind_the_stitch_gallery: string[];
   created_at: string;
@@ -40,6 +43,7 @@ export interface Product {
   fabric_name: string;
   fabric_history: string | null;
   occasion: OccasionType;
+  palette_color: PaletteColorId;
   price_cents: number;
   image_url: string;
   overlay_png_url: string;
@@ -80,7 +84,7 @@ export interface Order {
   stripe_payment_intent_id: string | null;
   amount_cents: number;
   status: OrderStatus;
-  measurement_snapshot: CustomizationSnapshot;
+  customization_snapshot: CustomizationSnapshot;
   created_at: string;
 }
 

@@ -60,7 +60,10 @@ export function CustomizePanel({ product }: CustomizePanelProps) {
 
     if ("demo" in result && result.demo) {
       router.push(`/checkout/success?demo=1&productId=${product.id}`);
+      return;
     }
+
+    setError("Checkout could not be completed. Please try again.");
   }
 
   const artisanHref = product.artisan.slug

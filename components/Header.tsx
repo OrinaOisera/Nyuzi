@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
+import { MobileNav } from "@/components/MobileNav";
 import { SignOutButton } from "@/components/SignOutButton";
 
 const navLink =
@@ -20,13 +21,13 @@ export async function Header() {
             <p className="font-display text-xl font-semibold tracking-tight text-nyuzi-ink transition group-hover:text-nyuzi-amber">
               Nyuzi
             </p>
-            <p className="text-[10px] uppercase tracking-[0.15em] text-nyuzi-muted">
+            <p className="hidden text-[10px] uppercase tracking-[0.15em] text-nyuzi-muted sm:block">
               African fashion, custom fit
             </p>
           </div>
         </Link>
 
-        <nav className="flex items-center gap-0.5 sm:gap-1">
+        <nav className="hidden items-center gap-0.5 md:flex md:gap-1">
           <Link href="/#shop" className={navLink}>
             Shop
           </Link>
@@ -56,6 +57,8 @@ export async function Header() {
             </Link>
           )}
         </nav>
+
+        <MobileNav session={session} />
       </div>
     </header>
   );

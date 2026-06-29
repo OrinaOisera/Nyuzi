@@ -57,7 +57,7 @@ export default async function CheckoutSuccessPage({ searchParams }: SuccessPageP
             </Link>
           )}
           <Link
-            href="/"
+            href="/#shop"
             className="inline-flex items-center justify-center rounded-full bg-nyuzi-amber px-7 py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-nyuzi-amber-dark"
           >
             Continue shopping

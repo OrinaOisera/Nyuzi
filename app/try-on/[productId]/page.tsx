@@ -1,6 +1,6 @@
 import { BackLink } from "@/components/BackLink";
+import { TryOnWorkspace } from "@/components/TryOnWorkspace";
 import { notFound, redirect } from "next/navigation";
-import { TryOnPanel } from "@/components/TryOnPanel";
 import { getProduct } from "@/lib/data";
 
 interface TryOnPageProps {
@@ -20,10 +20,10 @@ export default async function TryOnPage({ params }: TryOnPageProps) {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-      <BackLink href="/">Back to shop</BackLink>
-      <div className="mt-6">
-        <TryOnPanel product={product} />
+    <div className="min-h-screen bg-nyuzi-cream text-nyuzi-ink">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
+        <BackLink href="/#shop">Back to shop</BackLink>
+        <TryOnWorkspace product={product} />
       </div>
     </div>
   );

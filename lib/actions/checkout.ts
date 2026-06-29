@@ -14,8 +14,13 @@ interface CheckoutInput {
   customization: CustomizationSnapshot;
 }
 
-function checkoutCancelPath(category: string, productId: string): string {
-  return category === "garment" ? `/try-on/${productId}` : `/customize/${productId}`;
+function checkoutCancelPath(
+  category: string,
+  productId: string
+): string {
+  return category === "garment"
+    ? `/try-on/${productId}`
+    : `/customize/${productId}`;
 }
 
 export async function createCheckoutSession(input: CheckoutInput) {
@@ -38,7 +43,7 @@ export async function createCheckoutSession(input: CheckoutInput) {
         product_id: product.id,
         amount_cents: product.price_cents,
         status: "paid",
-        measurement_snapshot: input.customization,
+        customization_snapshot: input.customization,
         product_name: product.name,
         buyer_name: session?.fullName ?? "Demo Buyer",
         artisan_name: product.artisan.display_name,
@@ -92,7 +97,7 @@ export async function createCheckoutSession(input: CheckoutInput) {
     await execute(
       `insert into orders (
          buyer_id, artisan_id, product_id, stripe_session_id,
-         amount_cents, status, measurement_snapshot
+         amount_cents, status, customization_snapshot
        ) values ($1, $2, $3, $4, $5, 'pending', $6::jsonb)`,
       [
         buyerId,

@@ -92,7 +92,7 @@ export default async function ArtisanDashboardPage() {
                       </td>
                       <td className="px-4 py-4 text-stone-600">{order.buyer_name}</td>
                       <td className="px-4 py-4 text-stone-600">
-                        {formatCustomizationSummary(order.measurement_snapshot)}
+                        {formatCustomizationSummary(order.customization_snapshot)}
                       </td>
                       <td className="px-4 py-4 font-medium text-emerald-800">
                         {formatPrice(order.amount_cents)}

@@ -21,7 +21,7 @@ export default async function CustomizePage({ params }: CustomizePageProps) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-      <BackLink href="/">Back to shop</BackLink>
+      <BackLink href="/#shop">Back to shop</BackLink>
       <div className="mt-6">
         <CustomizePanel product={product} />
       </div>

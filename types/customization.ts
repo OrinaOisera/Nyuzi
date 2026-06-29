@@ -23,9 +23,18 @@ export type BeadPattern = "single_strand" | "woven" | "gradient" | "alternating"
 
 export type BrassStyle = "plain_cuff" | "engraved_adinkra" | "hammered" | "twisted";
 
+export type BodyBuild = "slender" | "athletic" | "curvy";
+
+export type MeasurementUnit = "cm" | "in";
+
 export interface GarmentCustomization {
   type: "garment";
   measurements: MeasurementInput;
+  bodyBuild?: BodyBuild;
+  undertone?: number;
+  shoulder_cm?: number;
+  sleeve_cm?: number;
+  unit?: MeasurementUnit;
 }
 
 export interface BagCustomization {
