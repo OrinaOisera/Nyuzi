@@ -6,7 +6,9 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:test": "node scripts/db-test.mjs",
+    "db:setup": "node scripts/db-setup.mjs"
   },
   "dependencies": {
     "next": "16.2.7",

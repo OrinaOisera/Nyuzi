@@ -41,8 +41,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col bg-nyuzi-cream text-nyuzi-ink">
+      <body
+        className="flex min-h-full flex-col bg-nyuzi-cream text-nyuzi-ink"
+        suppressHydrationWarning
+      >
         <Providers>
           <Header />
           <main className="flex-1">{children}</main>

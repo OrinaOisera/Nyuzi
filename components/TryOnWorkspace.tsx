@@ -101,44 +101,47 @@ export function TryOnWorkspace({ product }: TryOnWorkspaceProps) {
     setLoading(true);
     setError(null);
 
-    const saved = await saveMeasurements(measurements);
-    if (!saved.success) {
+    try {
+      const saved = await saveMeasurements(measurements);
+      if (!saved.success) {
+        setError(saved.error ?? "Could not save your measurements. Please try again.");
+        return;
+      }
+
+      const result = await createCheckoutSession({
+        productId: product.id,
+        customization: {
+          type: "garment",
+          measurements,
+          bodyBuild,
+          undertone,
+          shoulder_cm: shoulderCm,
+          sleeve_cm: sleeveCm,
+          unit,
+        },
+      });
+
+      if (!result.success) {
+        setError(result.error ?? "Checkout failed.");
+        return;
+      }
+
+      if ("url" in result && result.url) {
+        window.location.href = result.url;
+        return;
+      }
+
+      if ("demo" in result && result.demo) {
+        router.push(`/checkout/success?demo=1&productId=${product.id}`);
+        return;
+      }
+
+      setError("Checkout could not be completed. Please try again.");
+    } catch {
+      setError("Checkout could not be completed. Please try again.");
+    } finally {
       setLoading(false);
-      setError(saved.error ?? "Could not save your measurements. Please try again.");
-      return;
     }
-
-    const result = await createCheckoutSession({
-      productId: product.id,
-      customization: {
-        type: "garment",
-        measurements,
-        bodyBuild,
-        undertone,
-        shoulder_cm: shoulderCm,
-        sleeve_cm: sleeveCm,
-        unit,
-      },
-    });
-
-    setLoading(false);
-
-    if (!result.success) {
-      setError(result.error ?? "Checkout failed.");
-      return;
-    }
-
-    if ("url" in result && result.url) {
-      window.location.href = result.url;
-      return;
-    }
-
-    if ("demo" in result && result.demo) {
-      router.push(`/checkout/success?demo=1&productId=${product.id}`);
-      return;
-    }
-
-    setError("Checkout could not be completed. Please try again.");
   }
 
   function advanceStep() {
