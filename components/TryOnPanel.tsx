@@ -82,7 +82,7 @@ export function TryOnPanel({ product }: TryOnPanelProps) {
     await saveMeasurements(measurements);
     const result = await createCheckoutSession({
       productId: product.id,
-      measurements,
+      customization: { type: "garment", measurements },
     });
 
     setLoading(false);

@@ -11,6 +11,15 @@ create type occasion_type as enum (
   'casual_wear'
 );
 create type order_status as enum ('pending', 'paid', 'fulfilled', 'cancelled');
+create type product_category as enum ('garment', 'bag', 'accessory');
+create type palette_color as enum (
+  'indigo_blue',
+  'ochre_red',
+  'kente_gold',
+  'mud_brown',
+  'emerald_green',
+  'cowrie_cream'
+);
 
 create table profiles (
   id uuid primary key default uuid_generate_v4(),
@@ -28,6 +37,7 @@ create table artisans (
   slug text unique,
   location text,
   story text,
+  social_impact text,
   heritage_video_url text,
   behind_the_stitch_gallery jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now()
@@ -38,9 +48,11 @@ create table products (
   artisan_id uuid not null references artisans(id) on delete cascade,
   name text not null,
   description text,
+  category product_category not null default 'garment',
   fabric_name text not null,
   fabric_history text,
   occasion occasion_type not null default 'casual_wear',
+  palette_color palette_color not null default 'mud_brown',
   price_cents integer not null check (price_cents > 0),
   image_url text not null,
   overlay_png_url text not null,
@@ -68,11 +80,16 @@ create table orders (
   stripe_payment_intent_id text,
   amount_cents integer not null,
   status order_status not null default 'pending',
-  measurement_snapshot jsonb not null,
+  customization_snapshot jsonb not null,
   created_at timestamptz not null default now()
 );
 
 create index idx_products_occasion on products(occasion) where is_active = true;
+create index idx_products_category on products(category) where is_active = true;
+create index idx_products_palette on products(palette_color) where is_active = true;
 create index idx_products_artisan on products(artisan_id);
 create index idx_orders_buyer on orders(buyer_id);
 create index idx_measurements_user on measurements(user_id, updated_at desc);
+
+comment on column orders.customization_snapshot is
+  'JSON customization payload: garment (measurements + vault), bag, or accessory options';

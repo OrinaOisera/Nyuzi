@@ -1,5 +1,9 @@
 export type UserRole = "buyer" | "artisan" | "admin";
 
+import type { PaletteColorId } from "@/types/palette";
+
+export type ProductCategory = "garment" | "bag" | "accessory";
+
 export type OccasionType =
   | "traditional_wedding"
   | "formal_gala"
@@ -24,6 +28,7 @@ export interface Artisan {
   slug: string | null;
   location: string | null;
   story: string | null;
+  social_impact: string | null;
   heritage_video_url: string | null;
   behind_the_stitch_gallery: string[];
   created_at: string;
@@ -34,9 +39,11 @@ export interface Product {
   artisan_id: string;
   name: string;
   description: string | null;
+  category: ProductCategory;
   fabric_name: string;
   fabric_history: string | null;
   occasion: OccasionType;
+  palette_color: PaletteColorId;
   price_cents: number;
   image_url: string;
   overlay_png_url: string;
@@ -66,6 +73,8 @@ export interface MeasurementInput {
   height_cm: number;
 }
 
+import type { CustomizationSnapshot } from "@/types/customization";
+
 export interface Order {
   id: string;
   buyer_id: string;
@@ -75,7 +84,7 @@ export interface Order {
   stripe_payment_intent_id: string | null;
   amount_cents: number;
   status: OrderStatus;
-  measurement_snapshot: MeasurementInput;
+  customization_snapshot: CustomizationSnapshot;
   created_at: string;
 }
 

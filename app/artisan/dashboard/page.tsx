@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { OrderStatusSelect } from "@/components/OrderStatusSelect";
+import { formatCustomizationSummary } from "@/lib/format-customization";
 import { formatPrice } from "@/lib/format";
 import { getArtisanOrders } from "@/lib/data";
 import { getSession } from "@/lib/auth";
@@ -76,7 +77,7 @@ export default async function ArtisanDashboardPage() {
                   <tr>
                     <th className="px-4 py-3 font-medium">Product</th>
                     <th className="px-4 py-3 font-medium">Buyer</th>
-                    <th className="px-4 py-3 font-medium">Measurements</th>
+                    <th className="px-4 py-3 font-medium">Customization</th>
                     <th className="px-4 py-3 font-medium">Amount</th>
                     <th className="px-4 py-3 font-medium">Status</th>
                     <th className="px-4 py-3 font-medium">Update</th>
@@ -91,10 +92,7 @@ export default async function ArtisanDashboardPage() {
                       </td>
                       <td className="px-4 py-4 text-stone-600">{order.buyer_name}</td>
                       <td className="px-4 py-4 text-stone-600">
-                        B {order.measurement_snapshot.bust_cm} · W{" "}
-                        {order.measurement_snapshot.waist_cm} · H{" "}
-                        {order.measurement_snapshot.hips_cm} · {order.measurement_snapshot.height_cm}{" "}
-                        cm
+                        {formatCustomizationSummary(order.customization_snapshot)}
                       </td>
                       <td className="px-4 py-4 font-medium text-emerald-800">
                         {formatPrice(order.amount_cents)}

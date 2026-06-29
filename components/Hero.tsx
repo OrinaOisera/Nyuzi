@@ -1,12 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
+import { SITE_IMAGES } from "@/lib/assets";
 
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=900&q=80";
+const HERO_IMAGE = SITE_IMAGES.legacyHero.main;
 
-const HERO_ACCENT =
-  "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=400&q=80";
+const HERO_ACCENT = SITE_IMAGES.legacyHero.accent;
 
 export function Hero() {
   return (

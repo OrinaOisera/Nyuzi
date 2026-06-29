@@ -1,5 +1,6 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { getAuthSecret } from "@/lib/env";
 import { getDemoUser } from "@/lib/auth-types";
 
 export const authOptions: NextAuthOptions = {
@@ -54,5 +55,5 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET ?? "nyuzi-dev-secret-change-in-production",
+  secret: getAuthSecret(),
 };

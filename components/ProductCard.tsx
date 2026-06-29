@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/format";
+import { productHrefFromProduct } from "@/lib/product-routes";
+import { CATEGORY_LABELS } from "@/types/customization";
 import type { ProductWithArtisan } from "@/types/database";
 import { OCCASION_LABELS } from "@/types/database";
 
@@ -9,10 +11,21 @@ interface ProductCardProps {
   featured?: boolean;
 }
 
+function productCta(product: ProductWithArtisan): string {
+  if (product.category === "bag") return "Customize bag";
+  if (product.category === "accessory") return "Customize piece";
+  return "Try on virtually";
+}
+
 export function ProductCard({ product, featured = false }: ProductCardProps) {
   const artisanHref = product.artisan.slug
     ? `/artisan/${product.artisan.slug}`
     : `/artisan/${product.artisan.id}`;
+
+  const badgeLabel =
+    product.category === "garment"
+      ? OCCASION_LABELS[product.occasion]
+      : CATEGORY_LABELS[product.category];
 
   return (
     <article
@@ -22,7 +35,7 @@ export function ProductCard({ product, featured = false }: ProductCardProps) {
           : "ring-1 ring-stone-200/80 shadow-sm hover:ring-amber-200/90"
       }`}
     >
-      <Link href={`/try-on/${product.id}`} className="relative block">
+      <Link href={productHrefFromProduct(product)} className="relative block">
         <div className={`relative overflow-hidden bg-nyuzi-sand ${featured ? "aspect-[4/5]" : "aspect-[3/4]"}`}>
           <Image
             src={product.image_url}
@@ -33,7 +46,7 @@ export function ProductCard({ product, featured = false }: ProductCardProps) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-nyuzi-ink/70 via-nyuzi-ink/5 to-transparent" />
           <span className="absolute left-3 top-3 rounded-full bg-nyuzi-ink/80 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-sm">
-            {OCCASION_LABELS[product.occasion]}
+            {badgeLabel}
           </span>
           <span className="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-bold text-nyuzi-emerald backdrop-blur-sm">
             {formatPrice(product.price_cents)}
@@ -46,7 +59,7 @@ export function ProductCard({ product, featured = false }: ProductCardProps) {
               {product.name}
             </p>
             <span className="mt-3 inline-flex translate-y-2 items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-semibold text-nyuzi-ink opacity-0 shadow-lg transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-              Try on virtually
+              {productCta(product)}
               <span aria-hidden>→</span>
             </span>
           </div>

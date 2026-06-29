@@ -2,9 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
+import { formatCustomizationSummary } from "@/lib/format-customization";
 import { formatPrice } from "@/lib/format";
 import { getBuyerOrders, getProduct } from "@/lib/data";
+import { productHrefFromProduct } from "@/lib/product-routes";
 import { getSession } from "@/lib/auth";
+import type { BuyerOrderWithDetails } from "@/types/database";
 
 const STATUS_STYLES = {
   pending: "bg-amber-100 text-amber-800",
@@ -42,7 +45,7 @@ export default async function BuyerOrdersPage() {
           </p>
         </div>
         <Link
-          href="/"
+          href="/#shop"
           className="text-sm font-semibold text-amber-700 hover:underline"
         >
           Continue shopping →
@@ -68,7 +71,7 @@ export default async function BuyerOrdersPage() {
               Browse the shop, try on a garment, and place your first custom-fit order.
             </p>
             <Link
-              href="/"
+              href="/#shop"
               className="mt-6 inline-flex rounded-full bg-amber-600 px-6 py-3 font-semibold text-white hover:bg-amber-700"
             >
               Start shopping
@@ -77,55 +80,58 @@ export default async function BuyerOrdersPage() {
         ) : (
           <div className="grid gap-4">
             {orders.map((order) => (
-              <article
-                key={order.id}
-                className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"
-              >
-                <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-                  <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-xl bg-stone-100">
-                    <OrderThumbnail productId={order.product_id} alt={order.product_name} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div>
-                        <Link
-                          href={`/try-on/${order.product_id}`}
-                          className="font-semibold text-stone-900 hover:text-amber-700"
-                        >
-                          {order.product_name}
-                        </Link>
-                        <p className="text-sm text-stone-500">
-                          by {order.artisan_name}
-                        </p>
-                      </div>
-                      <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${STATUS_STYLES[order.status]}`}
-                      >
-                        {order.status}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-sm text-stone-600">
-                      Measurements: B {order.measurement_snapshot.bust_cm} · W{" "}
-                      {order.measurement_snapshot.waist_cm} · H{" "}
-                      {order.measurement_snapshot.hips_cm} ·{" "}
-                      {order.measurement_snapshot.height_cm} cm
-                    </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-                      <span className="font-semibold text-emerald-800">
-                        {formatPrice(order.amount_cents)}
-                      </span>
-                      <span className="text-stone-400">
-                        {new Date(order.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </article>
+              <OrderCard key={order.id} order={order} />
             ))}
           </div>
         )}
       </section>
     </div>
+  );
+}
+
+async function OrderCard({ order }: { order: BuyerOrderWithDetails }) {
+  const product = await getProduct(order.product_id);
+  const productLink = product
+    ? productHrefFromProduct(product)
+    : "/#shop";
+
+  return (
+    <article className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+      <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+        <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-xl bg-stone-100">
+          <OrderThumbnail productId={order.product_id} alt={order.product_name} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <Link
+                href={productLink}
+                className="font-semibold text-stone-900 hover:text-amber-700"
+              >
+                {order.product_name}
+              </Link>
+              <p className="text-sm text-stone-500">by {order.artisan_name}</p>
+            </div>
+            <span
+              className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${STATUS_STYLES[order.status]}`}
+            >
+              {order.status}
+            </span>
+          </div>
+          <p className="mt-2 text-sm text-stone-600">
+            Customization: {formatCustomizationSummary(order.customization_snapshot)}
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+            <span className="font-semibold text-emerald-800">
+              {formatPrice(order.amount_cents)}
+            </span>
+            <span className="text-stone-400">
+              {new Date(order.created_at).toLocaleDateString()}
+            </span>
+          </div>
+        </div>
+      </div>
+    </article>
   );
 }
 

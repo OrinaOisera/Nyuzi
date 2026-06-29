@@ -8,15 +8,18 @@ import {
 } from "@/lib/mock-data";
 import { getMockArtisanOrders, getMockBuyerOrders } from "@/lib/mock-order-store";
 import type { Artisan, BuyerOrderWithDetails, OrderWithDetails, Product, ProductWithArtisan } from "@/types/database";
+import { resolveProductPalette } from "@/types/palette";
 
 interface ProductRow {
   id: string;
   artisan_id: string;
   name: string;
   description: string | null;
+  category: Product["category"];
   fabric_name: string;
   fabric_history: string | null;
   occasion: Product["occasion"];
+  palette_color: Product["palette_color"];
   price_cents: number;
   image_url: string;
   overlay_png_url: string;
@@ -33,9 +36,11 @@ function mapProductRow(row: ProductRow): ProductWithArtisan {
     artisan_id: row.artisan_id,
     name: row.name,
     description: row.description,
+    category: row.category ?? "garment",
     fabric_name: row.fabric_name,
     fabric_history: row.fabric_history,
-    occasion: row.occasion,
+    occasion: row.occasion ?? "casual_wear",
+    palette_color: resolveProductPalette(row.id, row.palette_color),
     price_cents: Number(row.price_cents),
     image_url: row.image_url,
     overlay_png_url: row.overlay_png_url,
@@ -77,29 +82,37 @@ export async function getArtisans(): Promise<Artisan[]> {
 }
 
 export async function getProducts(
-  occasion?: string | null
+  occasion?: string | null,
+  category?: string | null
 ): Promise<ProductWithArtisan[]> {
   if (!isDatabaseConfigured()) {
-    return getMockProductsWithArtisans(occasion);
+    return getMockProductsWithArtisans(occasion, category);
   }
 
   try {
-    const rows = occasion
-      ? await query<ProductRow>(
-          `${PRODUCT_SELECT}
-           where p.is_active = true and p.occasion = $1::occasion_type
-           order by p.created_at desc`,
-          [occasion]
-        )
-      : await query<ProductRow>(
-          `${PRODUCT_SELECT}
-           where p.is_active = true
-           order by p.created_at desc`
-        );
+    const conditions = ["p.is_active = true"];
+    const params: string[] = [];
+
+    if (occasion) {
+      params.push(occasion);
+      conditions.push(`p.occasion = $${params.length}::occasion_type`);
+    }
+
+    if (category) {
+      params.push(category);
+      conditions.push(`p.category = $${params.length}::product_category`);
+    }
+
+    const rows = await query<ProductRow>(
+      `${PRODUCT_SELECT}
+       where ${conditions.join(" and ")}
+       order by p.created_at desc`,
+      params
+    );
 
     return rows.map(mapProductRow);
   } catch {
-    return getMockProductsWithArtisans(occasion);
+    return getMockProductsWithArtisans(occasion, category);
   }
 }
 
@@ -141,6 +154,7 @@ export async function getArtisanProducts(artisanId: string): Promise<Product[]> 
     return rows.map((row) => ({
       ...row,
       price_cents: Number(row.price_cents),
+      palette_color: resolveProductPalette(row.id, row.palette_color),
     }));
   } catch {
     return getMockProductsByArtisan(artisanId);
@@ -176,7 +190,7 @@ interface OrderRow {
   stripe_payment_intent_id: string | null;
   amount_cents: number;
   status: OrderWithDetails["status"];
-  measurement_snapshot: OrderWithDetails["measurement_snapshot"];
+  customization_snapshot: OrderWithDetails["customization_snapshot"];
   created_at: string;
   product_name: string;
   buyer_name: string;
@@ -192,7 +206,16 @@ export async function getArtisanOrders(
   try {
     const rows = await query<OrderRow>(
       `select
-         o.*,
+         o.id,
+         o.buyer_id,
+         o.artisan_id,
+         o.product_id,
+         o.stripe_session_id,
+         o.stripe_payment_intent_id,
+         o.amount_cents,
+         o.status,
+         o.customization_snapshot,
+         o.created_at,
          p.name as product_name,
          coalesce(pr.full_name, pr.email, 'Buyer') as buyer_name
        from orders o
@@ -212,7 +235,7 @@ export async function getArtisanOrders(
       stripe_payment_intent_id: row.stripe_payment_intent_id,
       amount_cents: Number(row.amount_cents),
       status: row.status,
-      measurement_snapshot: row.measurement_snapshot,
+      customization_snapshot: row.customization_snapshot,
       created_at: row.created_at,
       product_name: row.product_name,
       buyer_name: row.buyer_name,
@@ -231,7 +254,7 @@ interface BuyerOrderRow {
   stripe_payment_intent_id: string | null;
   amount_cents: number;
   status: BuyerOrderWithDetails["status"];
-  measurement_snapshot: BuyerOrderWithDetails["measurement_snapshot"];
+  customization_snapshot: BuyerOrderWithDetails["customization_snapshot"];
   created_at: string;
   product_name: string;
   artisan_name: string;
@@ -247,7 +270,16 @@ export async function getBuyerOrders(
   try {
     const rows = await query<BuyerOrderRow>(
       `select
-         o.*,
+         o.id,
+         o.buyer_id,
+         o.artisan_id,
+         o.product_id,
+         o.stripe_session_id,
+         o.stripe_payment_intent_id,
+         o.amount_cents,
+         o.status,
+         o.customization_snapshot,
+         o.created_at,
          p.name as product_name,
          a.display_name as artisan_name
        from orders o
@@ -267,7 +299,7 @@ export async function getBuyerOrders(
       stripe_payment_intent_id: row.stripe_payment_intent_id,
       amount_cents: Number(row.amount_cents),
       status: row.status,
-      measurement_snapshot: row.measurement_snapshot,
+      customization_snapshot: row.customization_snapshot,
       created_at: row.created_at,
       product_name: row.product_name,
       artisan_name: row.artisan_name,
