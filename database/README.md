@@ -17,6 +17,19 @@ DATABASE_SSL=true
 psql "$DATABASE_URL" -f database/schema.sql
 ```
 
+**No `psql` installed?** Use the Node script (reads `.env.local` or exported env):
+
+```bash
+npm run db:test    # test connection
+npm run db:setup   # schema + seed
+```
+
+Or install the client:
+
+```bash
+sudo apt install postgresql-client
+```
+
 5. Seed demo data:
 
 ```bash

@@ -41,29 +41,33 @@ export function CustomizePanel({ product }: CustomizePanelProps) {
     setLoading(true);
     setError(null);
 
-    const result = await createCheckoutSession({
-      productId: product.id,
-      customization,
-    });
+    try {
+      const result = await createCheckoutSession({
+        productId: product.id,
+        customization,
+      });
 
-    setLoading(false);
+      if (!result.success) {
+        setError(result.error ?? "Checkout failed.");
+        return;
+      }
 
-    if (!result.success) {
-      setError(result.error ?? "Checkout failed.");
-      return;
+      if ("url" in result && result.url) {
+        window.location.href = result.url;
+        return;
+      }
+
+      if ("demo" in result && result.demo) {
+        router.push(`/checkout/success?demo=1&productId=${product.id}`);
+        return;
+      }
+
+      setError("Checkout could not be completed. Please try again.");
+    } catch {
+      setError("Checkout could not be completed. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    if ("url" in result && result.url) {
-      window.location.href = result.url;
-      return;
-    }
-
-    if ("demo" in result && result.demo) {
-      router.push(`/checkout/success?demo=1&productId=${product.id}`);
-      return;
-    }
-
-    setError("Checkout could not be completed. Please try again.");
   }
 
   const artisanHref = product.artisan.slug

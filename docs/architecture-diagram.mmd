@@ -1,0 +1,73 @@
+flowchart TB
+  subgraph users [Users]
+    Buyer[Global Buyer]
+    Artisan[African Artisan]
+  end
+
+  subgraph vercel [Vercel — Next.js 16 App]
+    direction TB
+    subgraph browser [Browser — React 19 + Tailwind CSS 4]
+      Home[Homepage · Shop · Filters]
+      TryOn[Try-On Vault\nGarments]
+      Customize[Customize Workspace\nBags & Accessories]
+      Dashboard[Artisan Dashboard]
+      Orders[Buyer Orders]
+    end
+
+    subgraph server [Next.js Server]
+      Actions[Server Actions\ncheckout · measurements · orders]
+      API[API Routes\nauth · stripe webhook · health]
+      Data[lib/data.ts]
+      Auth[NextAuth.js\nDemo credentials]
+    end
+  end
+
+  subgraph aws [AWS Cloud]
+    Aurora[(Aurora PostgreSQL\nproducts · orders · measurements)]
+    S3[(S3 — optional\nmedia assets)]
+  end
+
+  subgraph external [External Services]
+    Stripe[Stripe Checkout\nPayments]
+  end
+
+  subgraph demo [Demo Mode — no env required]
+    Mock[Mock Data + In-Memory Orders]
+  end
+
+  Buyer --> Home
+  Buyer --> TryOn
+  Buyer --> Customize
+  Buyer --> Orders
+  Artisan --> Dashboard
+
+  Home --> Actions
+  TryOn --> Actions
+  Customize --> Actions
+  Dashboard --> Actions
+  Orders --> Data
+
+  Actions --> Data
+  Actions --> Auth
+  Actions --> Stripe
+  API --> Stripe
+  API --> Auth
+
+  Data -->|DATABASE_URL set| Aurora
+  Data -->|no DATABASE_URL| Mock
+  Actions -->|demo checkout| Mock
+
+  Stripe -->|webhook| API
+  Aurora -.->|optional| S3
+
+  classDef user fill:#DCA134,stroke:#3D2B20,color:#1A1614
+  classDef app fill:#F9F6F0,stroke:#1A1614,color:#1A1614
+  classDef aws fill:#FF9900,stroke:#232F3E,color:#fff
+  classDef ext fill:#635BFF,stroke:#1A1614,color:#fff
+  classDef demo fill:#E8E4DC,stroke:#1A1614,color:#1A1614
+
+  class Buyer,Artisan user
+  class Home,TryOn,Customize,Dashboard,Orders,Actions,API,Data,Auth app
+  class Aurora,S3 aws
+  class Stripe ext
+  class Mock demo

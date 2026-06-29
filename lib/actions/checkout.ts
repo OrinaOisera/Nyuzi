@@ -36,7 +36,29 @@ export async function createCheckoutSession(input: CheckoutInput) {
     const buyerId = await getBuyerId();
     const session = await getSession();
 
-    if (!isDatabaseConfigured()) {
+    if (isDatabaseConfigured()) {
+      try {
+        await execute(
+          `insert into orders (
+             buyer_id, artisan_id, product_id, amount_cents, status, customization_snapshot
+           ) values ($1, $2, $3, $4, 'paid', $5::jsonb)`,
+          [
+            buyerId,
+            product.artisan_id,
+            product.id,
+            product.price_cents,
+            JSON.stringify(input.customization),
+          ]
+        );
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Database error";
+        return {
+          success: false,
+          error: `Could not save order: ${message}. Check DATABASE_URL and run npm run db:setup.`,
+        };
+      }
+    } else {
       addMockOrder({
         buyer_id: buyerId,
         artisan_id: product.artisan_id,
